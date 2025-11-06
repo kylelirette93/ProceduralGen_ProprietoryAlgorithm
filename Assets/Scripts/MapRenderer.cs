@@ -1,51 +1,41 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MapRenderer : MonoBehaviour
 {
-    public GameObject topLeftCornerTile;
-    public GameObject topRightCornerTile;
-    public GameObject bottomLeftCornerTile;
-    public GameObject bottomRightCornerTile;
-    public GameObject rightWallTile;
-    public GameObject leftWallTile;
-    public GameObject emptyTile;
+    /// <summary>
+    /// Tile Mapping struct for associating type of tile with prefab.
+    /// </summary>
+    [Serializable]
+    public struct TileMapping
+    {
+        public TileType tileType;
+        public GameObject prefab;
+    }
+    public List<TileMapping> tileMappings;
+    public Dictionary<TileType, GameObject> tilePrefabs;
 
-    public void RenderMap(int[,] map)
+    private void Awake()
+    {
+        tilePrefabs = new Dictionary<TileType, GameObject>();
+        foreach (var mapping in tileMappings)
+        {
+            tilePrefabs[mapping.tileType] = mapping.prefab;
+        }
+    }
+
+    public void RenderMap(TileType[,] map)
     {
         for (int y = 0; y < map.GetLength(0); y++)
         {
             for (int x = 0; x < map.GetLength(1); x++)
             {
-                // Flip when rendering to match coordinates.
-                Vector3 position = new Vector3(-map.GetLength(1) / 2 + x, -y);
-
-                if (map[y, x] == 1)
+                Vector3 pos = new Vector3(-map.GetLength(1) / 2 + x, -y);
+                TileType tile = map[y, x];
+                if (tilePrefabs.ContainsKey(tile))
                 {
-                    GameObject newWallTile = Instantiate(topLeftCornerTile, position, Quaternion.identity);
-                }
-                else if (map[y, x] == 2)
-                {
-                    GameObject newWallTile = Instantiate(topRightCornerTile, position, Quaternion.identity);
-                }
-                else if (map[y, x] == 3)
-                {
-                    GameObject newWallTile = Instantiate(bottomLeftCornerTile, position, Quaternion.identity);
-                }
-                else if (map[y, x] == 4)
-                {
-                    GameObject newWallTile = Instantiate(bottomRightCornerTile, position, Quaternion.identity);
-                }
-                else if (map[y, x] == 5)
-                {
-                    GameObject newWallTile = Instantiate(leftWallTile, position, Quaternion.identity);
-                }
-                else if (map[y, x] == 6)
-                {
-                    GameObject newWallTile = Instantiate(rightWallTile, position, Quaternion.identity);
-                }
-                else
-                {
-                    GameObject newEmptyTile = Instantiate(emptyTile, position, Quaternion.identity);
+                    Instantiate(tilePrefabs[tile], pos, Quaternion.identity, transform);
                 }
             }
         }
