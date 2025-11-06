@@ -181,6 +181,8 @@ MonoBehaviour:
     prefab: {fileID: 2941269040025314270, guid: bc34a20a33d7f9d4986d8ddae59ce640, type: 3}
   - tileType: 0
     prefab: {fileID: 3049580433621097233, guid: fa08f006bf65db046b5ff5a913ee43a9, type: 3}
+  - tileType: 2
+    prefab: {fileID: 5525183048058272432, guid: 103788bc35f232c419389525b67ad058, type: 3}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

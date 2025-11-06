@@ -8,12 +8,15 @@ public class MapGenerator : MonoBehaviour
     int wellWidth = 20;
     int wellHeight = 100;
 
+    int walkerX = 0;
+
     private MapData mapData;
     private MapData roomData;
     private MapRenderer mapRenderer;
     List<int> rightWallPositions = new List<int>();
     List<int> leftWallPositions = new List<int>();
-    
+    List<int> platformPositions = new List<int>();
+
     private void Start()
     {
         GenerateMap();
@@ -33,24 +36,12 @@ public class MapGenerator : MonoBehaviour
     {
         for (int y = 0; y < mapData.Height; y++)
         {
-            // Get walker's x position so I can build walls around it.
-            int walkerX = 0;
-            foreach (Coord coord in walker.walkPoints)
-            {
-                // Find walkers x pos at this y level.
-                if (coord.tileY == y)
-                {
-                    walkerX = coord.tileX;
-                }
-            }
-            // Vary the well width and set wall position.
-            int wellWidth = Random.Range(10, 14);
-            int leftWallPos = walkerX - wellWidth / 2;
-            int rightWallPos = walkerX + wellWidth / 2;
-            leftWallPos = Mathf.Clamp(leftWallPos, 1, mapData.Width - 2);
-            rightWallPos = Mathf.Clamp(rightWallPos, 1, mapData.Width - 2);
-            leftWallPositions.Add(leftWallPos);
-            rightWallPositions.Add(rightWallPos);
+            walkerX = GetWalkerXPos(y, walker);
+           
+            CalculateWallPositions();
+            int leftWallPos = leftWallPositions[y];
+            int rightWallPos = rightWallPositions[y];
+            platformPositions = CalculatePlatformPositions(y, walkerX);
 
             for (int x = 0; x < mapData.Width; x++)
             {
@@ -59,30 +50,52 @@ public class MapGenerator : MonoBehaviour
                 else if (x == rightWallPos) mapData.SetTile(x, y, TileType.Solid);
                 else if (x > leftWallPos && x < rightWallPos) mapData.SetTile(x, y, TileType.Empty);
                 else mapData.SetTile(x, y, TileType.Solid);
-                AddDoorways(x, y);
             }
+            int[] choices = new int[] { 5, 10 };
+            int randomIndex = Random.Range(0, choices.Length);
+            if (platformPositions.Contains(walkerX) && y % choices[randomIndex] == 0 && walkerX > leftWallPos + 1 && walkerX < rightWallPos - 1) mapData.SetTile(walkerX, y, TileType.Platform);
         }
     }
 
-    void AddDoorways(int gridX, int gridY)
+    void CalculateWallPositions()
     {
-        List<Coord> doorPositions = new List<Coord>();
+        int wellWidth = Random.Range(10, 14);
+        int leftWallPos = walkerX - wellWidth / 2;
+        int rightWallPos = walkerX + wellWidth / 2;
+        leftWallPos = Mathf.Clamp(leftWallPos, 2, mapData.Width - 2);
+        rightWallPos = Mathf.Clamp(rightWallPos, 2, mapData.Width - 2);
+        leftWallPositions.Add(leftWallPos);
+        rightWallPositions.Add(rightWallPos);
+    }
 
-        for (int y = 0; y < mapData.Height; y++)
+    /// <summary>
+    /// Get's the walkers x position at a given y level.
+    /// </summary>
+    /// <param name="y">The walker's y level, while descending.</param>
+    /// <param name="walker">The walker is passed in, to loop through it's walk points.</param>
+    /// <returns></returns>
+    private int GetWalkerXPos(int y, RandomWalker walker)
+    {
+        // Find walker's x pos at this y level.
+        foreach (Coord coord in walker.walkPoints)
         {
-            if (y % 10 == 0 && gridX == 0 || gridX == mapData.Width)
+            if (coord.tileY == y)
             {
-                int leftWallX = leftWallPositions[y];
-                int rightWallX = rightWallPositions[y];
-                // Add door on left side.
-                
-                int leftDoorX = leftWallX;
-                mapData.SetTile(leftDoorX, y, TileType.Empty);
-                // Add door on right side.
-                int rightDoorX = rightWallX;
-                mapData.SetTile(rightDoorX, y, TileType.Empty);
+                return coord.tileX;
             }
         }
+        return 0; 
+    }
+
+    private List<int> CalculatePlatformPositions(int y, int walkerX)
+    {
+        int platformX = walkerX;
+        if (mapData.InBounds(platformX, y))
+        {
+            platformPositions.Add(platformX);
+        }
+
+        return platformPositions;
     }
 
     /// <summary>
@@ -191,5 +204,6 @@ public class MapGenerator : MonoBehaviour
 public enum TileType
 {
     Empty,
-    Solid
+    Solid,
+    Platform
 }
