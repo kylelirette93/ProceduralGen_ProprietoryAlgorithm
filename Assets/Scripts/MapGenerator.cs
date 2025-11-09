@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Rendering.Universal.Internal;
 
@@ -14,6 +15,7 @@ public class MapGenerator : MonoBehaviour
     int walkerX = 0;
 
     private MapData mapData;
+    BoxCollider2D[] collisionData;
     private MapData roomData;
     private MapRenderer mapRenderer;
     List<int> rightWallPositions = new List<int>();
@@ -22,8 +24,8 @@ public class MapGenerator : MonoBehaviour
     List<int> mapEdges = new List<int>();
 
     [Header("Walker Settings")]
-    [SerializeField] private int walkLength;
     [SerializeField] private WalkerType walkerPersonality = WalkerType.Random;
+    [SerializeField] bool isRandomPersonality = true;
 
     [Header("Noise Settings")]
     [Range(0.1f, 1f)]
@@ -31,7 +33,7 @@ public class MapGenerator : MonoBehaviour
     [Range(0.1f, 1f)]
     [SerializeField] private float perlinYScale = 0.2f;
 
-    [SerializeField] bool isRandomPersonality = true;
+
 
     private void Start()
     {
@@ -49,6 +51,7 @@ public class MapGenerator : MonoBehaviour
         FillMap(mapData, walker);
         mapRenderer = GetComponent<MapRenderer>();
         mapRenderer.RenderMap(mapData.Map);
+        GenerateCollisionData(mapData);
     }
 
     void FillMap(MapData mapData, RandomWalker walker)
@@ -141,6 +144,34 @@ public class MapGenerator : MonoBehaviour
         if (rightWallPos == mapData.Width - 1)
         {
             mapEdges.Add(rightWallPos);
+        }
+    }
+
+    private void GenerateCollisionData(MapData mapData)
+    {
+        for (int y = 0; y < mapData.Height; y++)
+        {
+            for (int x = 0; x < mapData.Width; x++)
+            {
+                TileType tile = mapData.GetTile(x, y);
+                if (tile == TileType.Solid)
+                {
+                    GameObject colliderObj = new GameObject("Collider_" + x + "_" + y);
+                    colliderObj.transform.position = new Vector3(-mapData.Width / 2 + x, -y);
+                    colliderObj.transform.parent = this.transform;
+                    BoxCollider2D boxCollider = colliderObj.AddComponent<BoxCollider2D>();
+                    boxCollider.size = new Vector2(1, 1);
+                }
+                else if (tile == TileType.Platform)
+                {
+                    GameObject colliderObj = new GameObject("Collider_" + x + "_" + y);
+                    // Offset for platform tile collider, idk it just works.
+                    colliderObj.transform.position = new Vector3(-mapData.Width / 2 + x, -y + -0.25f);
+                    colliderObj.transform.parent = this.transform;
+                    BoxCollider2D boxCollider = colliderObj.AddComponent<BoxCollider2D>();
+                    boxCollider.size = new Vector2(1, 0.5f);
+                }
+            }
         }
     }
 
