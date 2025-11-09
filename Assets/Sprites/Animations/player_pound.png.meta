@@ -1,16 +1,10 @@
 fileFormatVersion: 2
-guid: 2fbf635bfcd9fa2489458d8e10313237
+guid: 8886f4035ae300a4cb79d88f4c4fc8d5
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3902432758313232534
-    second: player_fall_0
-  - first:
-      213: 5428085043029730611
-    second: player_fall_1
-  - first:
-      213: 8224929551855851113
-    second: player_fall_2
+      213: -4093693957965072700
+    second: player_pound_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -52,12 +46,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 16
+  spritePixelsToUnits: 8
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -106,7 +100,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: player_fall_0
+      name: player_pound_0
       rect:
         serializedVersion: 2
         x: 0
@@ -121,74 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: a6754e01516c7d9c0800000000000000
-      internalID: -3902432758313232534
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: player_fall_1
-      rect:
-        serializedVersion: 2
-        x: 8
-        y: 0
-        width: 8
-        height: 8
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 335e560669e645b40800000000000000
-      internalID: 5428085043029730611
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: player_fall_2
-      rect:
-        serializedVersion: 2
-        x: 16
-        y: 0
-        width: 8
-        height: 8
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 9661bf099d1d42270800000000000000
-      internalID: 8224929551855851113
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: player_fall_3
-      rect:
-        serializedVersion: 2
-        x: 24
-        y: 0
-        width: 8
-        height: 8
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: f7cf6402d22888b44a8ef6f4cc50c5f6
-      internalID: -311294538
+      spriteID: 4c63458d8074037c0800000000000000
+      internalID: -4093693957965072700
       vertices: []
       indices: 
       edges: []
@@ -197,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 0d95728ce71f8e44ab077bafd453fefc
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -207,10 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      player_fall_0: -3902432758313232534
-      player_fall_1: 5428085043029730611
-      player_fall_2: 8224929551855851113
-      player_fall_3: -311294538
+      player_pound_0: -4093693957965072700
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

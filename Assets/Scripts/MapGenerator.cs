@@ -67,7 +67,7 @@ public class MapGenerator : MonoBehaviour
 
             for (int x = 0; x < mapData.Width; x++)
             {
-                Debug.Log(leftWallPos);
+                //Debug.Log(leftWallPos);
                 if (x == leftWallPos) mapData.SetTile(x, y, TileType.Solid);
                 else if (x == rightWallPos) mapData.SetTile(x, y, TileType.Solid);
                 else if (x > leftWallPos && x < rightWallPos) mapData.SetTile(x, y, TileType.Empty);
@@ -149,30 +149,34 @@ public class MapGenerator : MonoBehaviour
 
     private void GenerateCollisionData(MapData mapData)
     {
-        for (int y = 0; y < mapData.Height; y++)
+        // Loop through map renderer dictionary and create colliders for solid and platform tiles.
+        
+        List<BoxCollider2D> colliders = new List<BoxCollider2D>();
+        foreach (var mapping in mapRenderer.tileMappings)
         {
-            for (int x = 0; x < mapData.Width; x++)
+            TileType tileType = mapping.tileType;
+            if (tileType == TileType.Solid)
             {
-                TileType tile = mapData.GetTile(x, y);
-                if (tile == TileType.Solid)
+                if (mapRenderer.SpawnedTiles.TryGetValue(tileType, out List<GameObject> tiles))
                 {
-                    GameObject colliderObj = new GameObject("Collider_" + x + "_" + y);
-                    colliderObj.transform.gameObject.layer = LayerMask.NameToLayer("Ground");
-                    colliderObj.transform.position = new Vector3(-mapData.Width / 2 + x, -y);
-                    colliderObj.transform.parent = this.transform;
-                    BoxCollider2D boxCollider = colliderObj.AddComponent<BoxCollider2D>();
-                    boxCollider.size = new Vector2(1, 1);
+                    foreach (GameObject tileObj in tiles)
+                    {
+                        tileObj.layer = LayerMask.NameToLayer("Ground");
+                        tileObj.AddComponent<BoxCollider2D>();
+                    }
                 }
-                else if (tile == TileType.Platform)
+            }
+            else if (tileType == TileType.Platform)
+            {
+                if (mapRenderer.SpawnedTiles.TryGetValue(tileType, out List<GameObject> tiles))
                 {
-                    GameObject colliderObj = new GameObject("Collider_" + x + "_" + y);
-                    // Set layer mask.
-                    colliderObj.transform.gameObject.layer = LayerMask.NameToLayer("Ground");
-                    // Offset for platform tile collider, idk it just works.
-                    colliderObj.transform.position = new Vector3(-mapData.Width / 2 + x, -y + -0.25f);
-                    colliderObj.transform.parent = this.transform;
-                    BoxCollider2D boxCollider = colliderObj.AddComponent<BoxCollider2D>();
-                    boxCollider.size = new Vector2(1, 0.5f);
+                    foreach (GameObject tileObj in tiles)
+                    {
+                        tileObj.layer = LayerMask.NameToLayer("Ground");
+                        BoxCollider2D platformCollider = tileObj.AddComponent<BoxCollider2D>();
+                        platformCollider.size = new Vector2(platformCollider.size.x, platformCollider.size.y * 0.5f);
+                        platformCollider.offset = new Vector2(platformCollider.offset.x, platformCollider.offset.y - platformCollider.size.y * 0.50f);
+                    }
                 }
             }
         }

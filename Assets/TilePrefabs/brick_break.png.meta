@@ -1,13 +1,67 @@
 fileFormatVersion: 2
-guid: d287c7ad068daa14faab4afe2c23820f
+guid: ff45fce4e1282d442a919431456cfac8
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 9203954956759660754
-    second: player_right_0
+      213: 8131462651032228105
+    second: brick_break_0
   - first:
-      213: 4753830350613710001
-    second: player_right_1
+      213: 2517717427490890747
+    second: brick_break_1
+  - first:
+      213: 1912122004167562969
+    second: brick_break_2
+  - first:
+      213: 2271346656896565870
+    second: brick_break_3
+  - first:
+      213: 2780120572476816796
+    second: brick_break_4
+  - first:
+      213: 7750001219954139835
+    second: brick_break_5
+  - first:
+      213: -7141001705228208824
+    second: brick_break_6
+  - first:
+      213: 5986175368371951082
+    second: brick_break_7
+  - first:
+      213: 3949215481026188977
+    second: brick_break_8
+  - first:
+      213: -8615569534258112332
+    second: brick_break_9
+  - first:
+      213: 93052662076721683
+    second: brick_break_10
+  - first:
+      213: 8241597353412369241
+    second: brick_break_11
+  - first:
+      213: -1503923875303790665
+    second: brick_break_12
+  - first:
+      213: -3826092324423724223
+    second: brick_break_13
+  - first:
+      213: -6640501181471702358
+    second: brick_break_14
+  - first:
+      213: -7718845173428455245
+    second: brick_break_15
+  - first:
+      213: 2116196257446277229
+    second: brick_break_16
+  - first:
+      213: -8059831338989236986
+    second: brick_break_17
+  - first:
+      213: -7904285714091103382
+    second: brick_break_18
+  - first:
+      213: -7029314492803936104
+    second: brick_break_19
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -51,10 +105,10 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 8
+  spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -103,89 +157,133 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: player_move_0
+      name: brick_break_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 8
-        height: 8
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 0890bc1b7e947bf41ac2b1d15a5d8fc3
-      internalID: -218923785
+      spriteID: 901d123e232c8d070800000000000000
+      internalID: 8131462651032228105
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: player_move_1
+      name: brick_break_1
       rect:
         serializedVersion: 2
-        x: 8
+        x: 32
         y: 0
-        width: 8
-        height: 8
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: e7644da1fd9fa454b9d47fb89340bd83
-      internalID: -1101056417
+      spriteID: bf3a76e29aab0f220800000000000000
+      internalID: 2517717427490890747
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: player_move_2
+      name: brick_break_2
       rect:
         serializedVersion: 2
-        x: 16
+        x: 64
         y: 0
-        width: 8
-        height: 8
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 46669e39f7e3bdf45acefe5aa8011196
-      internalID: -1782182328
+      spriteID: 9d69d99f4d8398a10800000000000000
+      internalID: 1912122004167562969
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: player_move_3
+      name: brick_break_3
       rect:
         serializedVersion: 2
-        x: 24
+        x: 96
         y: 0
-        width: 8
-        height: 8
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: 07d21bad34f169b40ba51ef6aab4d040
-      internalID: 161808657
+      spriteID: e62471610c1758f10800000000000000
+      internalID: 2271346656896565870
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: brick_break_4
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c9d7c335ee8f49620800000000000000
+      internalID: 2780120572476816796
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: brick_break_5
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bb2e53c5c098d8b60800000000000000
+      internalID: 7750001219954139835
       vertices: []
       indices: 
       edges: []
@@ -194,7 +292,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 20718fae0a741014f9d29cd466aff498
+    spriteID: 9e68b2645fe6a1344848688026e55d78
     internalID: 0
     vertices: []
     indices: 
@@ -204,10 +302,12 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      player_move_0: -218923785
-      player_move_1: -1101056417
-      player_move_2: -1782182328
-      player_move_3: 161808657
+      brick_break_0: 8131462651032228105
+      brick_break_1: 2517717427490890747
+      brick_break_2: 1912122004167562969
+      brick_break_3: 2271346656896565870
+      brick_break_4: 2780120572476816796
+      brick_break_5: 7750001219954139835
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -15,6 +15,8 @@ public class MapRenderer : MonoBehaviour
     }
     public List<TileMapping> tileMappings;
     public Dictionary<TileType, GameObject> tilePrefabs;
+    public Dictionary<TileType, List<GameObject>> SpawnedTiles => spawnedTiles;
+    private Dictionary<TileType, List<GameObject>> spawnedTiles = new Dictionary<TileType, List<GameObject>>();
 
     private void Awake()
     {
@@ -35,7 +37,12 @@ public class MapRenderer : MonoBehaviour
                 TileType tile = map[y, x];
                 if (tilePrefabs.ContainsKey(tile))
                 {
-                    Instantiate(tilePrefabs[tile], pos, Quaternion.identity, transform);
+                    GameObject tileObj = Instantiate(tilePrefabs[tile], pos, Quaternion.identity, transform);
+                    if (!spawnedTiles.ContainsKey(tile))
+                    {
+                        spawnedTiles[tile] = new List<GameObject>();
+                    }
+                    spawnedTiles[tile].Add(tileObj);
                 }
             }
         }
