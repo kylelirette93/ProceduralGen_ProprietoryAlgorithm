@@ -9,8 +9,8 @@ public class MapGenerator : MonoBehaviour
     [Header("Well Settings")]
     [Range(10, 20)]
     [SerializeField] int wellWidth = 20;
-    [Range(50, 200)]
-    [SerializeField] int wellHeight = 100;
+    [Range(50, 2000)]
+    [SerializeField] int wellHeight = 50;
 
     int walkerX = 0;
 
@@ -157,6 +157,7 @@ public class MapGenerator : MonoBehaviour
                 if (tile == TileType.Solid)
                 {
                     GameObject colliderObj = new GameObject("Collider_" + x + "_" + y);
+                    colliderObj.transform.gameObject.layer = LayerMask.NameToLayer("Ground");
                     colliderObj.transform.position = new Vector3(-mapData.Width / 2 + x, -y);
                     colliderObj.transform.parent = this.transform;
                     BoxCollider2D boxCollider = colliderObj.AddComponent<BoxCollider2D>();
@@ -165,6 +166,8 @@ public class MapGenerator : MonoBehaviour
                 else if (tile == TileType.Platform)
                 {
                     GameObject colliderObj = new GameObject("Collider_" + x + "_" + y);
+                    // Set layer mask.
+                    colliderObj.transform.gameObject.layer = LayerMask.NameToLayer("Ground");
                     // Offset for platform tile collider, idk it just works.
                     colliderObj.transform.position = new Vector3(-mapData.Width / 2 + x, -y + -0.25f);
                     colliderObj.transform.parent = this.transform;
