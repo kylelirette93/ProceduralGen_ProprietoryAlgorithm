@@ -189,6 +189,7 @@ public class MapGenerator : MonoBehaviour
         leftWallPositions.Clear();
         platformPositions.Clear();
         mapEdges.Clear();
+        mapRenderer.SpawnedTiles.Clear();
         // Destroy existing tiles in the scene.
         foreach (Transform child in transform)
         {

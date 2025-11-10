@@ -6,12 +6,17 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement Settings")]
     [SerializeField] float movementSpeed = 5f;
+    float horizontalInput;
 
     [Header("Jump Settings")]
     [SerializeField] float jumpForce = 10f;
     [SerializeField] float groundCheckDistance = 0.1f;
+    bool hasAlreadyJumped = false;
+
+    [Header("Head Bonk Settings")]
     [SerializeField] float headCheckDistance = 0.1f;
     [SerializeField] float bonkBackForce = 5f;
+
 
     Animator animator;
     Rigidbody2D rb2D;
@@ -20,7 +25,7 @@ public class PlayerController : MonoBehaviour
     public bool IsGroundPounding => isGroundPounding;   
     bool isGroundPounding;
     float lastBonkTime = -1f;
-    float headBonkCooldown = 0.1f;
+    float headBonkCooldown = 0.3f;
 
     private void Start()
     {
@@ -32,7 +37,7 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         // Ground check.
-        isGrounded = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, LayerMask.GetMask("Ground"));
+        isGrounded = Physics2D.BoxCast(transform.position, new Vector2(0.5f, 0.2f), 0f, Vector2.down, groundCheckDistance, LayerMask.GetMask("Ground"));
 
         if (isGrounded && isGroundPounding)
         {
@@ -50,12 +55,13 @@ public class PlayerController : MonoBehaviour
         }
 
         // Movement.
-        float horizontalInput = Input.GetAxis("Horizontal");
+        horizontalInput = Input.GetAxis("Horizontal");
         rb2D.linearVelocity = new Vector2(horizontalInput * movementSpeed, rb2D.linearVelocity.y);
 
         // Jumping.
         if (isGrounded && Input.GetKeyDown(KeyCode.Space) && !isGroundPounding)
         {
+            hasAlreadyJumped = true;
             AudioManager.Instance.PlaySound("Jump");
             rb2D.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         }
@@ -76,9 +82,12 @@ public class PlayerController : MonoBehaviour
             spriteRenderer.flipX = horizontalInput < 0;
         }
         // Check for tile above head.
-        if (rb2D.linearVelocity.y > 0 && Time.time > lastBonkTime)
+        if (rb2D.linearVelocity.y > 0)
         {
-            HeadCheck();
+            if (Time.time > lastBonkTime + headBonkCooldown)
+            {
+                HeadCheck();
+            }
         }
     }
 
@@ -114,5 +123,11 @@ public class PlayerController : MonoBehaviour
             rb2D.constraints = RigidbodyConstraints2D.FreezeRotation;
             rb2D.linearVelocity = new Vector2(0, -50f);
         });
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawCube(transform.position + Vector3.down * groundCheckDistance, new Vector3(0.5f, 0.2f, 0));
     }
 }
