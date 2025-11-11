@@ -4,7 +4,9 @@ public class BrickBreak : MonoBehaviour
 {
     [SerializeField] ParticleSystem explosionParticles;
 
-
+    /// <summary>
+    /// Handles tile breakage with fancy particles.
+    /// </summary>
     public void BreakTile()
     {
         if (explosionParticles != null)

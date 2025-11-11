@@ -27,21 +27,29 @@ public class MapRenderer : MonoBehaviour
         }
     }
 
-    public void RenderMap(TileType[,] map)
+    /// <summary>
+    /// Renders the map based on tile types.
+    /// </summary>
+    /// <param name="map">The map.</param>
+    /// <param name="offset">The offset, to be used for rooms.</param>
+    public void RenderMap(TileType[,] map, Vector2 offset = default)
     {
         for (int y = 0; y < map.GetLength(0); y++)
         {
             for (int x = 0; x < map.GetLength(1); x++)
             {
-                Vector3 pos = new Vector3(-map.GetLength(1) / 2 + x, -y);
+                Vector3 pos = new Vector3(-map.GetLength(1) / 2 + x + offset.x, -y - offset.y);
+                // Get the tile based on map position.
                 TileType tile = map[y, x];
                 if (tilePrefabs.ContainsKey(tile))
                 {
+                    // Instantiate tile prefab at position.
                     GameObject tileObj = Instantiate(tilePrefabs[tile], pos, Quaternion.identity, transform);
                     if (!spawnedTiles.ContainsKey(tile))
                     {
                         spawnedTiles[tile] = new List<GameObject>();
                     }
+                    // Add to list, I'll destroy them later.
                     spawnedTiles[tile].Add(tileObj);
                 }
             }

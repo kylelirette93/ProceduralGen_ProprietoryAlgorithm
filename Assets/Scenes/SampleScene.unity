@@ -313,10 +313,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   wellWidth: 20
   wellHeight: 200
-  walkerPersonality: 1
-  isRandomPersonality: 1
-  perlinXScale: 0.1
-  perlinYScale: 0.2
+  walkerPersonality: 3
+  isRandomPersonality: 0
+  perlinXScale: 0.442
+  perlinYScale: 0.642
 --- !u!114 &319476734
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -396,12 +396,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc0dca5277d0f6e48af9760e75ff24a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mapGenerator: {fileID: 319476733}
   movementSpeed: 5
   jumpForce: 9
   groundCheckDistance: 0.65
   headCheckDistance: 0.8
   bonkBackForce: 5
-  isGrounded: 0
+  groundPoundForce: 20
 --- !u!212 &430417924
 SpriteRenderer:
   m_ObjectHideFlags: 0
