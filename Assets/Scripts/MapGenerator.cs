@@ -24,6 +24,7 @@ public class MapGenerator : MonoBehaviour
     List<int> mapEdges = new List<int>();
     List<Coord> doorways = new List<Coord>();
     List<(MapData, Coord)> rooms = new List<(MapData, Coord)>();
+    float platformCollisionOffset = 0.5f;
 
     [Header("Walker Settings")]
     [SerializeField] private WalkerType walkerPersonality = WalkerType.Random;
@@ -93,7 +94,7 @@ public class MapGenerator : MonoBehaviour
             int rightWallPos = rightWallPositions[y];
 
             // Calculate platforms for the walker to poop out.
-            platformPositions = CalculatePlatformPositions(y, walkerX);
+            int platformX = CalculatePlatformPositions(y, walkerX);
 
             for (int x = 0; x < mapData.Width; x++)
             {
@@ -105,7 +106,7 @@ public class MapGenerator : MonoBehaviour
                 else mapData.SetTile(x, y, TileType.Solid);
             }
             // Poop out those platforms!
-            PlacePlatform(leftWallPos, rightWallPos, y);
+            PlacePlatform(leftWallPos, rightWallPos, y, platformX);
             // Create doorways at intervals.
             if (y % 25 == 0)
             {
@@ -161,15 +162,15 @@ public class MapGenerator : MonoBehaviour
     /// <param name="y">The walker's current y level.</param>
     /// <param name="walkerX">The walker's x position.</param>
     /// <returns></returns>
-    private List<int> CalculatePlatformPositions(int y, int walkerX)
+    private int CalculatePlatformPositions(int y, int walkerX)
     {
         int platformX = walkerX;
         if (mapData.InBounds(platformX, y))
         {
-            platformPositions.Add(platformX);
+            return platformX;
         }
 
-        return platformPositions;
+        return -1;
     }
     /// <summary>
     /// Place platforms between walls at intervals.
@@ -177,15 +178,15 @@ public class MapGenerator : MonoBehaviour
     /// <param name="leftWallPos">The left wall position.</param>
     /// <param name="rightWallPos">The right wall position.</param>
     /// <param name="y">This y level.</param>
-    private void PlacePlatform(int leftWallPos, int rightWallPos, int y)
+    private void PlacePlatform(int leftWallPos, int rightWallPos, int y, int platformX)
     {
         int[] platformInterval = { 5, 10 };
         int randomIndex = Random.Range(0, platformInterval.Length);
-        if (platformPositions.Contains(walkerX) && y % platformInterval[randomIndex] == 0 
-            && walkerX > leftWallPos + 1 && walkerX < rightWallPos - 1)
+        if (platformX != -1 && y % platformInterval[randomIndex] == 0 
+            && platformX > leftWallPos + 1 && platformX < rightWallPos - 1)
         {
             // It's ok dude, you can poop now.
-            mapData.SetTile(walkerX, y, TileType.Platform);
+            mapData.SetTile(platformX, y, TileType.Platform);
         }
     }
 
@@ -223,6 +224,11 @@ public class MapGenerator : MonoBehaviour
                 {
                     foreach (GameObject tileObj in tiles)
                     {
+                        // Remove old colliders if they exist.
+                        if (tileObj.TryGetComponent<BoxCollider2D>(out BoxCollider2D existingCollider))
+                        {
+                            Destroy(existingCollider);
+                        }
                         tileObj.layer = LayerMask.NameToLayer("Ground");
                         tileObj.AddComponent<BoxCollider2D>();
                     }
@@ -237,8 +243,8 @@ public class MapGenerator : MonoBehaviour
                         tileObj.layer = LayerMask.NameToLayer("Ground");
                         BoxCollider2D platformCollider = tileObj.AddComponent<BoxCollider2D>();
                         // Offset the height a little bit for the player.
-                        platformCollider.size = new Vector2(platformCollider.size.x, platformCollider.size.y * 0.5f);
-                        platformCollider.offset = new Vector2(platformCollider.offset.x, platformCollider.offset.y - platformCollider.size.y * 0.50f);
+                        platformCollider.size = new Vector2(platformCollider.size.x, platformCollider.size.y * platformCollisionOffset);
+                        platformCollider.offset = new Vector2(platformCollider.offset.x, platformCollider.offset.y - platformCollider.size.y * platformCollisionOffset);
                     }
                 }
             }
@@ -329,11 +335,17 @@ public class MapGenerator : MonoBehaviour
         leftWallPositions.Clear();
         platformPositions.Clear();
         mapEdges.Clear();
-        mapRenderer.SpawnedTiles.Clear();
-        foreach (Transform child in transform)
+        foreach (var tileList in mapRenderer.SpawnedTiles.Values)
         {
-            Destroy(child.gameObject);
+            foreach (GameObject tile in tileList)
+            {
+                if (tile != null)
+                { 
+                    tile.SetActive(false);
+                }
+            }
         }
+        mapRenderer.SpawnedTiles.Clear();
     }
 
     /// <summary>
@@ -385,21 +397,7 @@ public class MapGenerator : MonoBehaviour
                 int x = center;
                 int randomDirection = Random.Range(1, 3);
 
-                // Give walker a memory to avoid consistent move cycles.
-                if (randomDirection == lastDirection)
-                {
-                    consecutiveMoves++;
-                }
-                else
-                {
-                    consecutiveMoves = 0;
-                }
-                if (consecutiveMoves > 2)
-                {
-                    randomDirection = (randomDirection == 1) ? 2 : 1;
-                    consecutiveMoves = 0;
-                }
-                lastDirection = randomDirection;
+                randomDirection = GetDirectionByMemory(randomDirection);
 
                 // If random personality is toggled, pick a personality at each step.
                 if (isRandomPersonality)
@@ -437,6 +435,32 @@ public class MapGenerator : MonoBehaviour
                     center = x;
                 }
             }
+        }
+
+        /// <summary>
+        /// Get's direction based on last direction.
+        /// </summary>
+        /// <param name="randomDirection"></param>
+        /// <returns></returns>
+        private int GetDirectionByMemory(int randomDirection)
+        {
+            // Give walker a memory to avoid consistent move cycles.
+            if (randomDirection == lastDirection)
+            {
+                consecutiveMoves++;
+                if (consecutiveMoves > 2)
+                {
+                    consecutiveMoves = 0;
+                    return randomDirection == 1 ? 2 : 1;
+                }
+            }
+            else
+            {
+                consecutiveMoves = 0;
+            }
+
+            lastDirection = randomDirection;
+            return randomDirection;
         }
     }
 

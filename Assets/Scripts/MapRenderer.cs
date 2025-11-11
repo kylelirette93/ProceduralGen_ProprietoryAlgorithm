@@ -44,13 +44,18 @@ public class MapRenderer : MonoBehaviour
                 if (tilePrefabs.ContainsKey(tile))
                 {
                     // Instantiate tile prefab at position.
-                    GameObject tileObj = Instantiate(tilePrefabs[tile], pos, Quaternion.identity, transform);
-                    if (!spawnedTiles.ContainsKey(tile))
+                    GameObject tileObj = ObjectPool.SharedInstance.GetPooledObject(tilePrefabs[tile]);
+                    if (tileObj != null)
                     {
-                        spawnedTiles[tile] = new List<GameObject>();
+                        tileObj.SetActive(true);
+                        tileObj.transform.position = pos;
+                        if (!spawnedTiles.ContainsKey(tile))
+                        {
+                            spawnedTiles[tile] = new List<GameObject>();
+                        }
+                        // Add to list, I'll destroy them later.
+                        spawnedTiles[tile].Add(tileObj);
                     }
-                    // Add to list, I'll destroy them later.
-                    spawnedTiles[tile].Add(tileObj);
                 }
             }
         }
