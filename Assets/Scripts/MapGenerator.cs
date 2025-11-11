@@ -1,8 +1,5 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.Rendering.Universal.Internal;
 
 public class MapGenerator : MonoBehaviour
 {
@@ -263,15 +260,12 @@ public class MapGenerator : MonoBehaviour
             int nx = edge + (edge == 0 ? 1 : -1);
 
             // Check if theres space for daorway.
-            if (mapData.GetTile(nx, y + 1) == TileType.Empty &&
-                mapData.GetTile(nx, y) == TileType.Empty &&
-                mapData.GetTile(nx, y - 1) == TileType.Empty)
+            if (mapData.GetTile(edge, y) == TileType.Solid && mapData.GetTile(nx, y) == TileType.Empty)
             {
                 for (int i = 0; i < doorHeight; i++)
                 {
                     // Generate doorway based on height.
                     mapData.SetTile(edge, y - i, TileType.Empty);
-                    doorways.Add(new Coord(edge, y - i));
                 }
                 // Generate room based on doorway.
                 int roomWidth = mapData.Width;
@@ -281,7 +275,7 @@ public class MapGenerator : MonoBehaviour
 
                 // Store room with coordinate to offset in rendering.
                 rooms.Add((room, new Coord(edge, y - doorHeight)));
-            }          
+            }
         }
     }
 
@@ -335,6 +329,8 @@ public class MapGenerator : MonoBehaviour
         leftWallPositions.Clear();
         platformPositions.Clear();
         mapEdges.Clear();
+
+        rooms.Clear();
         foreach (var tileList in mapRenderer.SpawnedTiles.Values)
         {
             foreach (GameObject tile in tileList)
