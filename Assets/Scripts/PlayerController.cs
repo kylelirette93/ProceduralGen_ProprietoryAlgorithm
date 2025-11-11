@@ -155,6 +155,7 @@ public class PlayerController : MonoBehaviour
         mainCam.transform.SetParent(transform);
         rb2D.constraints = RigidbodyConstraints2D.FreezeAll;
         playerCollider.enabled = false;
+        AudioManager.Instance.PlaySound("Reset");
         resetSequence.Append(transform.DOMove(initialSpawnPosition + new Vector3(0, 1f, 0), 2f).SetEase(Ease.InOutQuad));
         resetSequence.Join(transform.DORotate(new Vector3(0, 0, -360), 2f, RotateMode.FastBeyond360).SetEase(Ease.Linear));
         resetSequence.OnComplete(() =>
