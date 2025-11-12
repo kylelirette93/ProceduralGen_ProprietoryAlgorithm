@@ -417,6 +417,11 @@ MonoBehaviour:
   isRandomPersonality: 0
   perlinXScale: 0.385
   perlinYScale: 0.705
+  doorwaySpawnInterval: 25
+  doorwayHeight: 3
+  corridorWidth: 8
+  minPlatformInterval: 8
+  maxPlatformInterval: 12
 --- !u!114 &319476734
 MonoBehaviour:
   m_ObjectHideFlags: 0

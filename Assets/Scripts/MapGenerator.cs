@@ -8,6 +8,7 @@ public class MapGenerator : MonoBehaviour
     [SerializeField] int wellWidth = 20;
     [Range(50, 2000)]
     [SerializeField] int wellHeight = 50;
+    private const int MAP_LEFT_EDGE = 0;
     public int WellHeight => wellHeight;
 
     // General map data.
@@ -34,6 +35,25 @@ public class MapGenerator : MonoBehaviour
     [Range(0.1f, 1f)]
     [SerializeField] private float perlinYScale = 0.2f;
 
+    [Header("Door Settings")]
+    [Range(15, 50)]
+    [SerializeField] private int doorwaySpawnInterval = 25;
+    [Range(3, 6)]
+    [SerializeField] private int doorwayHeight = 3;
+    private const int WALL_SPACING = 2;
+    private const int ROOM_ENTRY_DEPTH = 1;
+
+    [Header("Path Settings")]
+    [Range(8, 12)]
+    [SerializeField] private int corridorWidth = 10;
+
+    [Header("Platform Settings")]
+    [Range(4, 10)]
+    [SerializeField] private int minPlatformInterval = 5;
+    [Range(10, 20)]
+    [SerializeField] private int maxPlatformInterval = 10;
+    private const int MIN_PLATFORM_PADDING = 1;
+    private int platformInterval;
 
     private void Start()
     {
@@ -42,8 +62,14 @@ public class MapGenerator : MonoBehaviour
 
     public void GenerateMap()
     {
+        platformInterval = 0;
         if (mapData != null) ClearMap();
-
+        
+        // Lazy initialization.
+        if (platformInterval == 0)
+        {
+            platformInterval = CalculatePlatformInterval();
+        }
         // Generate map and room.
         mapData = new MapData(wellWidth, wellHeight);
         roomData = new MapData(wellWidth, wellHeight);
@@ -86,9 +112,7 @@ public class MapGenerator : MonoBehaviour
             walkerX = GetWalkerXPos(y, walker);
             
             // Calculate wall positions based on walker.
-            CalculateWallPositions();
-            int leftWallPos = leftWallPositions[y];
-            int rightWallPos = rightWallPositions[y];
+            CalculateWallPositions(out int leftWallPos, out int rightWallPos);
 
             // Calculate platforms for the walker to poop out.
             int platformX = CalculatePlatformPositions(y, walkerX);
@@ -105,7 +129,7 @@ public class MapGenerator : MonoBehaviour
             // Poop out those platforms!
             PlacePlatform(leftWallPos, rightWallPos, y, platformX);
             // Create doorways at intervals.
-            if (y % 25 == 0)
+            if (y % doorwaySpawnInterval == 0)
             {
                 CalculateDoorway(y);
             }
@@ -115,12 +139,10 @@ public class MapGenerator : MonoBehaviour
     /// <summary>
     /// Calculate wall positions based on walkers x position.
     /// </summary>
-    void CalculateWallPositions()
+    void CalculateWallPositions(out int leftWallPos, out int rightWallPos)
     {
-        // Calculate wall based on walkers x position.
-        int wellWidth = Random.Range(10, 14);
-        int leftWallPos = walkerX - wellWidth / 2;
-        int rightWallPos = walkerX + wellWidth / 2;
+        leftWallPos = walkerX - corridorWidth / 2;
+        rightWallPos = walkerX + corridorWidth / 2;
         // Clamp to map bounds.
         leftWallPos = Mathf.Clamp(leftWallPos, 0, mapData.Width - 1);
         rightWallPos = Mathf.Clamp(rightWallPos, 0, mapData.Width - 1);
@@ -130,8 +152,8 @@ public class MapGenerator : MonoBehaviour
             CalculateEdges(leftWallPos, rightWallPos);
         }
         // Store the wall positions.
-        leftWallPositions.Add(leftWallPos);
-        rightWallPositions.Add(rightWallPos);
+        //leftWallPositions.Add(leftWallPos);
+        //rightWallPositions.Add(rightWallPos);
     }
 
     /// <summary>
@@ -170,6 +192,15 @@ public class MapGenerator : MonoBehaviour
         return -1;
     }
     /// <summary>
+    /// Calculate random interval for platform placement.
+    /// </summary>
+    /// <returns>Returns a random interval for platform to place.</returns>
+    private int CalculatePlatformInterval()
+    {
+        int[] fixedIntervals = { minPlatformInterval, maxPlatformInterval };
+        return fixedIntervals[Random.Range(0, fixedIntervals.Length)];
+    }
+    /// <summary>
     /// Place platforms between walls at intervals.
     /// </summary>
     /// <param name="leftWallPos">The left wall position.</param>
@@ -177,10 +208,8 @@ public class MapGenerator : MonoBehaviour
     /// <param name="y">This y level.</param>
     private void PlacePlatform(int leftWallPos, int rightWallPos, int y, int platformX)
     {
-        int[] platformInterval = { 5, 10 };
-        int randomIndex = Random.Range(0, platformInterval.Length);
-        if (platformX != -1 && y % platformInterval[randomIndex] == 0 
-            && platformX > leftWallPos + 1 && platformX < rightWallPos - 1)
+        if (platformX != MAP_LEFT_EDGE - MIN_PLATFORM_PADDING && y % platformInterval == MAP_LEFT_EDGE 
+            && platformX > leftWallPos + MIN_PLATFORM_PADDING && platformX < rightWallPos - MIN_PLATFORM_PADDING)
         {
             // It's ok dude, you can poop now.
             mapData.SetTile(platformX, y, TileType.Platform);
@@ -194,7 +223,7 @@ public class MapGenerator : MonoBehaviour
     /// <param name="rightWallPos">The right wall position.</param>
     private void CalculateEdges(int leftWallPos, int rightWallPos)
     {
-        if (leftWallPos == 0)
+        if (leftWallPos == MAP_LEFT_EDGE)
         {
             mapEdges.Add(leftWallPos);
         }
@@ -254,27 +283,26 @@ public class MapGenerator : MonoBehaviour
     /// <param name="y">The y level to place a door.</param>
     private void CalculateDoorway(int y)
     {
-        int doorHeight = Random.Range(3, 6);
         foreach (int edge in mapEdges)
         {
-            int nx = edge + (edge == 0 ? 1 : -1);
+            int nx = edge + (edge == MAP_LEFT_EDGE ? ROOM_ENTRY_DEPTH : -ROOM_ENTRY_DEPTH);
 
             // Check if theres space for daorway.
             if (mapData.GetTile(edge, y) == TileType.Solid && mapData.GetTile(nx, y) == TileType.Empty)
             {
-                for (int i = 0; i < doorHeight; i++)
+                for (int i = 0; i < doorwayHeight; i++)
                 {
                     // Generate doorway based on height.
                     mapData.SetTile(edge, y - i, TileType.Empty);
                 }
                 // Generate room based on doorway.
                 int roomWidth = mapData.Width;
-                MapData room = new MapData(roomWidth, doorHeight + 2);
-                bool isLeftEdge = (edge == 0);
-                CalculateRoom(room, doorHeight, isLeftEdge);
+                MapData room = new MapData(roomWidth, doorwayHeight + WALL_SPACING);
+                bool isLeftEdge = (edge == MAP_LEFT_EDGE);
+                CalculateRoom(room, doorwayHeight, isLeftEdge);
 
                 // Store room with coordinate to offset in rendering.
-                rooms.Add((room, new Coord(edge, y - doorHeight)));
+                rooms.Add((room, new Coord(edge, y - doorwayHeight)));
             }
         }
     }
@@ -297,13 +325,13 @@ public class MapGenerator : MonoBehaviour
             for (int x = 0; x < roomData.Width; x++)
             {
                 // Top of room.
-                bool topWall = (y == 0);               
+                bool topWall = (y == MAP_LEFT_EDGE);               
                 // Bottom of room.
                 bool bottomWall = (y == roomData.Height - 1);             
                 // Back wall of room.
-                bool backWall = isLeftEdge ? (x == 0) : (x == roomData.Width - 1);
+                bool backWall = isLeftEdge ? (x == MAP_LEFT_EDGE) : (x == roomData.Width - 1);
                 // Doorway side of room, depending on which edge of map its on.
-                bool doorwaySide = isLeftEdge ? (x == roomData.Width - 1) : (x == 0);
+                bool doorwaySide = isLeftEdge ? (x == roomData.Width - 1) : (x == MAP_LEFT_EDGE);
                 // Doorway area which should be empty.
                 bool isDoorway = doorwaySide && (y >= doorStart && y < doorEnd);
 
@@ -351,14 +379,41 @@ public class MapGenerator : MonoBehaviour
     {
         public List<Coord> walkPoints = new List<Coord>();
         private int center;
-        private int lastDirection = 0;
+
+        private Direction randomDirection;
+        private Direction lastDirection = 0;
         private int consecutiveMoves = 0;
         int walkLength;
         private WalkerType walkerPersonality;
-
         float perlinXScale = 0.1f;
         float perlinYScale = 0.2f;
         bool isRandomPersonality = true;
+        private static readonly int WALKER_TYPE_COUNT = System.Enum.GetNames(typeof(WalkerType)).Length;
+
+        // Direction for walker movement.
+        private const int MIN_DIRECTION = 1;
+        private const int MAX_DIRECTION = 3;
+
+        // Perlin noise thresholds.
+        private const float PERLIN_THRESHOLD_LOW = 0.4f;
+        private const float PERLIN_THRESHOLD_HIGH = 0.6f;
+
+        // Border padding constants.
+        private const int  MIN_MAP_BORDER_PADDING = 1;
+        private const int MAX_MAP_BORDER_PADDING = 2;
+
+        // Drunkard constants.
+        private const int DRUNKARD_MIN_STEP = 1;
+        private const int DRUNKARD_MAX_STEP = 3;
+
+        // Zig zag constants.
+        private const int ZIGZAG_MOVE_DURATION = 2;
+        private const int ZIGZAG_FREQUENCY = 4;
+
+        private const int MAX_CONSECUTIVE_MOVES = 2;
+
+
+
 
         /// <summary>
         /// Now that's a big dirty constructor right there. Guess this guy needs some info.
@@ -391,40 +446,40 @@ public class MapGenerator : MonoBehaviour
             for (int i = 0; i < walkLength; i++)
             { 
                 int x = center;
-                int randomDirection = Random.Range(1, 3);
+                randomDirection = (Direction)Random.Range((int)Direction.Left, (int)Direction.Right + 1);
 
                 randomDirection = GetDirectionByMemory(randomDirection);
 
-                // If random personality is toggled, pick a personality at each step.
+                // If random personality is toggled, pick a personality at each walk step.
                 if (isRandomPersonality)
                 {
-                    walkerPersonality = (WalkerType)Random.Range(0, 4);
+                    walkerPersonality = (WalkerType)Random.Range(0, WALKER_TYPE_COUNT);
                 }
                 if (mapData.InBounds(x, i))
                 {
                     switch (walkerPersonality)
                     {
                         case WalkerType.Random:
-                            if (randomDirection == 1) x--;
-                            else if (randomDirection == 2) x++;
+                            if (randomDirection == Direction.Left) x--;
+                            else if (randomDirection == Direction.Right) x++;
                             break;
                         case WalkerType.Drunkard:
-                            if (randomDirection == 1) x -= Random.Range(1, 3);
-                            else if (randomDirection == 2) x += Random.Range(1, 3);
+                            if (randomDirection == Direction.Left) x -= Random.Range(DRUNKARD_MIN_STEP, DRUNKARD_MAX_STEP);
+                            else if (randomDirection == Direction.Right) x += Random.Range(DRUNKARD_MIN_STEP, DRUNKARD_MAX_STEP);
                             break;
                         case WalkerType.ZigZag:
-                            if (i % 4 < 2) x--;
+                            if (i % ZIGZAG_FREQUENCY < ZIGZAG_MOVE_DURATION) x--;
                             else x++;
                             break;
                         case WalkerType.PerlinMerlin:
                             float perlinNoise = Mathf.PerlinNoise(i * perlinXScale, perlinYScale);
-                            if (perlinNoise < 0.4f) x--;
-                            else if (perlinNoise > 0.6f) x++;
+                            if (perlinNoise < PERLIN_THRESHOLD_LOW) x--;
+                            else if (perlinNoise > PERLIN_THRESHOLD_HIGH) x++;
                             break;
                     }
                    
                     // Clamp walker within bounds.
-                    x = Mathf.Clamp(x, 1, mapData.Width - 2);
+                    x = Mathf.Clamp(x, MIN_MAP_BORDER_PADDING, mapData.Width - MAX_MAP_BORDER_PADDING);
                     //Debug.Log("Walker at: " + x + ", " + i);
                     walkPoints.Add(new Coord(x, i));
                     // Reset center for next iteration.
@@ -438,28 +493,30 @@ public class MapGenerator : MonoBehaviour
         /// </summary>
         /// <param name="randomDirection"></param>
         /// <returns></returns>
-        private int GetDirectionByMemory(int randomDirection)
+        private Direction GetDirectionByMemory(Direction randomDirection)
         {
             // Give walker a memory to avoid consistent move cycles.
             if (randomDirection == lastDirection)
             {
                 consecutiveMoves++;
-                if (consecutiveMoves > 2)
+                if (consecutiveMoves > MAX_CONSECUTIVE_MOVES)
                 {
                     consecutiveMoves = 0;
-                    return randomDirection == 1 ? 2 : 1;
+                    return randomDirection == Direction.Left ? Direction.Right : Direction.Left;
                 }
             }
             else
             {
                 consecutiveMoves = 0;
             }
-
             lastDirection = randomDirection;
             return randomDirection;
         }
     }
-
+    public enum Direction
+    {
+        Left = 1, Right = 2
+    }
     public enum WalkerType { Random, Drunkard, ZigZag, PerlinMerlin }
 
     /// <summary>
